@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:fontFamily="@font/alex_brush"
+        android:gravity="center"
+        android:text="PDF Viewer"
+        android:textColor="#140F0F"
+        android:textSize="60sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="25dp"
+        android:backgroundTint="#706695"
+        android:text="Duyệt thư mục"
+        android:textSize="20sp"
+        app:cornerRadius="15dp" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Đường dẫn:"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+   <androidx.recyclerview.widget.RecyclerView
+       android:id="@+id/recyclerview"
+       android:textColor="@color/black"
+       android:layout_width="match_parent"
+       android:layout_height="0dp"
+       android:layout_weight="1" />
+
+
+
+</LinearLayout>
