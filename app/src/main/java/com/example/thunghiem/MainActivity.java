@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView imgViewLock;
     private Switch switchRemember;
     private Button btnLogin;
+    private TextView txtForgotPassword;
     private SharedPreferences sharedPreferences;
     private boolean isPasswordVisible = false;
     private boolean isFirstLogin = false;
@@ -40,25 +42,25 @@ public class MainActivity extends AppCompatActivity {
         imgViewLock = findViewById(R.id.imageView2);
         switchRemember = findViewById(R.id.switch1);
         btnLogin = findViewById(R.id.button2);
+        txtForgotPassword = findViewById(R.id.textView4);
         sharedPreferences = getSharedPreferences("LoginPrefs", MODE_PRIVATE);
     }
 
     private void checkFirstLogin() {
-        // Kiểm tra xem đã có tài khoản được tạo chưa
         isFirstLogin = !sharedPreferences.contains("registeredUsername");
         if (isFirstLogin) {
-            // Nếu là lần đầu, đổi text của button thành "Đăng ký"
             btnLogin.setText("Đăng ký");
             Toast.makeText(this, "Hãy tạo tài khoản cho lần đăng nhập đầu tiên",
                     Toast.LENGTH_LONG).show();
+        } else {
+            btnLogin.setText("Đăng nhập");
         }
     }
 
     private void loadSavedCredentials() {
-        if (sharedPreferences.getBoolean("rememberMe", false)) {
+        if (!isFirstLogin && sharedPreferences.getBoolean("rememberMe", false)) {
             String savedUsername = sharedPreferences.getString("savedUsername", "");
             String savedPassword = sharedPreferences.getString("savedPassword", "");
-
             edtUsername.setText(savedUsername);
             edtPassword.setText(savedPassword);
             switchRemember.setChecked(true);
@@ -68,12 +70,21 @@ public class MainActivity extends AppCompatActivity {
     private void setupListeners() {
         imgViewLock.setOnClickListener(v -> togglePasswordVisibility());
 
+        txtForgotPassword.setOnClickListener(v -> {
+            new androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setTitle("Xác nhận")
+                    .setMessage("Bạn có chắc muốn xóa tài khoản hiện tại và đăng ký lại?")
+                    .setPositiveButton("Đồng ý", (dialog, which) -> resetAccount())
+                    .setNegativeButton("Hủy", null)
+                    .show();
+        });
+
         btnLogin.setOnClickListener(v -> {
             String username = edtUsername.getText().toString().trim();
             String password = edtPassword.getText().toString().trim();
 
             if (username.isEmpty() || password.isEmpty()) {
-                Toast.makeText(MainActivity.this, "Vui lòng nhập đầy đủ thông tin",
+                Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin",
                         Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -86,8 +97,22 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void resetAccount() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply();
+
+        isFirstLogin = true;
+        btnLogin.setText("Đăng ký");
+        edtUsername.setText("");
+        edtPassword.setText("");
+        switchRemember.setChecked(false);
+
+        Toast.makeText(this, "Đã xóa tài khoản. Vui lòng đăng ký tài khoản mới",
+                Toast.LENGTH_LONG).show();
+    }
+
     private void handleFirstLogin(String username, String password) {
-        // Lưu thông tin tài khoản đăng ký
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("registeredUsername", username);
         editor.putString("registeredPassword", password);
@@ -96,7 +121,6 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, "Đăng ký thành công! Hãy đăng nhập lại",
                 Toast.LENGTH_SHORT).show();
 
-        // Reset lại form và chuyển sang chế độ đăng nhập
         isFirstLogin = false;
         btnLogin.setText("Đăng nhập");
         edtUsername.setText("");
@@ -114,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 clearSavedCredentials();
             }
-
+            Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(MainActivity.this, MainPDFActivity.class));
             finish();
         } else {
